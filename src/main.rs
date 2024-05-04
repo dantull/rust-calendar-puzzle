@@ -1,4 +1,10 @@
 mod geometry;
+use std::collections::HashMap;
+
+use geometry::Point;
+
+mod board;
+use board::make_point_board;
 
 mod stringify;
 use stringify::convert_to_points;
@@ -23,4 +29,6 @@ fn main() {
 
     let result = strs.join("\n");
     println!("{}", result);
+
+    let mut board = make_point_board((points));
 }
