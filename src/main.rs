@@ -7,6 +7,7 @@ use board::make_point_board;
 
 mod stringify;
 use geometry::VisualShape;
+use stringify::convert_to_labeled_points;
 use stringify::convert_to_points;
 use stringify::convert_to_shape;
 use stringify::convert_to_strings;
@@ -37,6 +38,22 @@ fn main() {
     // Print the points
     for point in &points {
         println!("({}, {})", point.x, point.y);
+    }
+
+    let board_pts = convert_to_labeled_points(&[
+        "Jan Feb Mar Apr May Jun",
+        "Jul Aug Sep Oct Nov Dec",
+        "  1   2   3   4   5   6   7 ",
+        "  8   9  10  11  12  13  14 ",
+        " 15  16  17  18  19  20  21 ",
+        " 22  23  24  25  26  27  28 ",
+        " 29  30  31 Sun Mon Tue Wed ",
+        "                Thu Fri Sat ",
+    ], 4);
+
+    println!("Labeled Points:");
+    for labeled_point in &board_pts {
+        println!("Label: {}, Point: ({}, {})", labeled_point.label, labeled_point.point.x, labeled_point.point.y);
     }
 
     let strs = convert_to_strings(&points, |_| 'x');
