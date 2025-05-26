@@ -1,5 +1,4 @@
 mod geometry;
-use std::collections::HashMap;
 
 use geometry::Point;
 
