@@ -80,7 +80,7 @@ fn main() {
 
     let res = board.fill(shape.points, "X");
 
-    if (res.is_some()) {
+    if res.is_some() {
         println!("Board after placing piece:");
         print_board(&points, &board);
 

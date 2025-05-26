@@ -1,4 +1,4 @@
-use crate::geometry::{LabeledPoint, LabeledPoints, Point, Shape, ShapeAttrs, VisualShape};
+use crate::geometry::{LabeledPoint, LabeledPoints, Point, Shape, VisualShape};
 
 pub fn convert_to_points(shape: &[&str], blank: &str) -> Vec<Point> {
     let mut points = Vec::new();

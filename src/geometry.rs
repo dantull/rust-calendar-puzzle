@@ -29,5 +29,3 @@ pub struct Shape<P> {
     pub points: Vec<P>, // Using Vec<P> to represent an array of points
     pub attrs: ShapeAttrs, // Storing ShapeAttrs within Shape
 }
-
-pub type LabeledShapes<P> = std::collections::HashMap<String, Shape<P>>;
