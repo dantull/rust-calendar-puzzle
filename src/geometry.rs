@@ -12,7 +12,7 @@ pub struct LabeledPoint<P> {
 
 pub type LabeledPoints<P> = Vec<LabeledPoint<P>>;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ShapeAttrs {
     pub chiral: bool,
     pub rotations: u8, // Since Rust doesn't have union types, we'll use u8 to represent 0, 1, or 3 rotations

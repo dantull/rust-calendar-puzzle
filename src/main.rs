@@ -7,7 +7,9 @@ mod board;
 use board::make_point_board;
 
 mod stringify;
+use geometry::VisualShape;
 use stringify::convert_to_points;
+use stringify::convert_to_shape;
 use stringify::convert_to_strings;
 
 fn print_board(points: &[Point], board: &board::Board<Point>) {
@@ -45,15 +47,26 @@ fn main() {
 
     let mut board = make_point_board(points.clone());
 
-    let res = board.fill(vec![Point { x: 0, y: 0 }, Point { x: 0, y: 1 }], "X");
+    let shape = convert_to_shape(&VisualShape {
+        points: vec![
+            "**".to_string(),
+            "*".to_string()
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: false,
+            rotations: 0,
+        },
+    });
+
+    let res = board.fill(shape.points, "X");
 
     if (res.is_some()) {
-        println!("Board after placing 2 square X piece:");
+        println!("Board after placing piece:");
         print_board(&points, &board);
 
         board.unfill(res.unwrap());
 
-        println!("Board after un-placing 2 square X piece:");
+        println!("Board after removing piece:");
     }
     print_board(&points, &board);
 }
