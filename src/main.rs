@@ -58,6 +58,10 @@ fn main() {
         },
     });
 
+    for p in board.remaining() {
+        println!("Remaining point: ({}, {})", p.x, p.y);
+    }
+
     let res = board.fill(shape.points, "X");
 
     if (res.is_some()) {
@@ -69,4 +73,8 @@ fn main() {
         println!("Board after removing piece:");
     }
     print_board(&points, &board);
+
+    for p in board.remaining() {
+        println!("Remaining point: ({}, {})", p.x, p.y);
+    }
 }

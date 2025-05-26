@@ -86,7 +86,7 @@ impl<P:Copy> Board<P> {
 
     pub fn unfill(&mut self, eps: Vec<Pe>) {
         for ep in eps {
-            self.unfilled.remove(&ep);
+            self.unfilled.insert(ep);
             self.filled.remove(&ep);
         }
     }
