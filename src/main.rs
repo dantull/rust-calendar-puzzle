@@ -84,9 +84,13 @@ fn main() {
         println!("Board after placing piece:");
         print_board(&points, &board);
 
+        let count = board.reachable(&Point{x: 2, y: 0}, 20);
+        println!("Reachable points from (2, 0): {}", count);
+
         board.unfill(res.unwrap());
 
         println!("Board after removing piece:");
+
     }
     print_board(&points, &board);
 
