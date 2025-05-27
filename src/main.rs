@@ -8,7 +8,6 @@ use board::make_point_board;
 mod stringify;
 use geometry::VisualShape;
 use stringify::convert_to_labeled_points;
-use stringify::convert_to_points;
 use stringify::convert_to_shape;
 use stringify::convert_to_strings;
 
@@ -26,20 +25,6 @@ fn print_board(points: &[Point], board: &board::Board<Point>) {
 
 
 fn main() {
-    let shape = vec![
-        "****",
-        "*  *",
-        "*  *",
-        "****",
-    ];
-
-    let points = convert_to_points(&shape, " ");
-
-    // Print the points
-    for point in &points {
-        println!("({}, {})", point.x, point.y);
-    }
-
     let board_pts = convert_to_labeled_points(&[
         "Jan Feb Mar Apr May Jun",
         "Jul Aug Sep Oct Nov Dec",
@@ -53,8 +38,10 @@ fn main() {
 
     println!("Labeled Points:");
     for labeled_point in &board_pts {
-        println!("Label: {}, Point: ({}, {})", labeled_point.label, labeled_point.point.x, labeled_point.point.y);
+        println!("{} => ({}, {})", labeled_point.label, labeled_point.point.x, labeled_point.point.y);
     }
+
+    let points: Vec<Point> = board_pts.iter().map(|lp| lp.point).collect();
 
     let strs = convert_to_strings(&points, |_| 'x');
 
@@ -65,36 +52,28 @@ fn main() {
 
     let shape = convert_to_shape(&VisualShape {
         points: vec![
-            "**".to_string(),
+            "***".to_string(),
             "*".to_string()
         ],
         attrs: geometry::ShapeAttrs {
-            chiral: false,
-            rotations: 0,
+            chiral: true,
+            rotations: 3,
         },
     });
 
-    for p in board.remaining() {
-        println!("Remaining point: ({}, {})", p.x, p.y);
-    }
+    let count = board.reachable(&Point{x: 2, y: 0}, 20);
+    println!("Reachable points from (2, 0): {}", count);
 
-    let res = board.fill(shape.points, "X");
 
-    if res.is_some() {
-        println!("Board after placing piece:");
-        print_board(&points, &board);
+    let remaining_points: Vec<_> = board.remaining().into_iter().cloned().collect();
+    for p in remaining_points {
+        let res = board.fill(shape.points.clone(), p, "X");
 
-        let count = board.reachable(&Point{x: 2, y: 0}, 20);
-        println!("Reachable points from (2, 0): {}", count);
+        if res.is_some() {
+            println!("===================");
+            print_board(&points, &board);
 
-        board.unfill(res.unwrap());
-
-        println!("Board after removing piece:");
-
-    }
-    print_board(&points, &board);
-
-    for p in board.remaining() {
-        println!("Remaining point: ({}, {})", p.x, p.y);
+            board.unfill(res.unwrap());
+        }
     }
 }
