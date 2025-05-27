@@ -29,3 +29,51 @@ pub struct Shape<P> {
     pub points: Vec<P>, // Using Vec<P> to represent an array of points
     pub attrs: ShapeAttrs, // Storing ShapeAttrs within Shape
 }
+
+type Mapper = fn(Point) -> Point;
+
+fn flip_point(p: Point) -> Point {
+    Point { x: -p.x, y: p.y }
+}
+
+fn identity(p: Point) -> Point {
+    p
+}
+
+const ROTATES: [Mapper; 4] = [
+    identity, // 0 degrees rotation
+    |p: Point| Point { x: -p.y, y: p.x },   // 90 degrees rotation
+    |p: Point| Point { x: -p.x, y: -p.y },  // 180 degrees rotation
+    |p: Point| Point { x: p.y, y: -p.x },   // 270 degrees rotation
+];
+
+impl<P: Copy> Shape<P>
+where
+    P: Into<Point> + From<Point>,
+{
+    pub fn variants(&self) -> Vec<Vec<Point>> {
+        let flips: Vec<Mapper> = if self.attrs.chiral {
+            vec![identity, flip_point]
+        } else {
+            vec![identity]
+        };
+
+        let mut vs = Vec::with_capacity(self.attrs.rotations as usize * flips.len());
+
+        for &flip in &flips {
+            for i in 0..=self.attrs.rotations {
+                let rotate = ROTATES[(i as usize) % 4];
+                let v: Vec<Point> = self.points
+                    .iter()
+                    .map(|&p| {
+                        let pt: Point = p.into();
+                        rotate(flip(pt))
+                    })
+                    .collect();
+                vs.push(v);
+            }
+        }
+
+        vs
+    }
+}

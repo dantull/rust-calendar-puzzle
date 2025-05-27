@@ -64,16 +64,19 @@ fn main() {
     let count = board.reachable(&Point{x: 2, y: 0}, 20);
     println!("Reachable points from (2, 0): {}", count);
 
+    let shape_variants = shape.variants();
 
     let remaining_points: Vec<_> = board.remaining().into_iter().cloned().collect();
     for p in remaining_points {
-        let res = board.fill(shape.points.clone(), p, "X");
+        for v in &shape_variants {
+            let res = board.fill(v.to_vec(), p, "X");
 
-        if res.is_some() {
-            println!("===================");
-            print_board(&points, &board);
+            if res.is_some() {
+                println!("=========");
+                print_board(&points, &board);
 
-            board.unfill(res.unwrap());
+                board.unfill(res.unwrap());
+            }
         }
     }
 }
