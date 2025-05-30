@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 // Importing the Point struct from the geometry module
 use crate::Point;
@@ -22,14 +22,14 @@ pub struct Board<P> {
     dirs: Vec<P>,
 }
 
-impl<P:Copy> Board<P> {
+impl<P: Copy> Board<P> {
     // Constructor
     pub fn new(ps: Vec<P>, encoder: Encoder<P>, adder: BinaryOperation<P>, dirs: Vec<P>) -> Self {
         let mut unfilled = HashSet::new();
         for p in &ps {
             unfilled.insert(encoder(p));
         }
-        
+
         Board {
             filled: HashMap::new(),
             unfilled,
@@ -104,7 +104,10 @@ impl<P:Copy> Board<P> {
 
     // Method to get the remaining unfilled points
     pub fn remaining(&self) -> Vec<&P> {
-        self.all.iter().filter(|p| self.unfilled.contains(&(self.encoder)(p))).collect()
+        self.all
+            .iter()
+            .filter(|p| self.unfilled.contains(&(self.encoder)(p)))
+            .collect()
     }
 }
 
@@ -123,10 +126,15 @@ pub fn add(a: &Point, b: &Point) -> Point {
 
 // Function to create a Point Board
 pub fn make_point_board(points: Vec<Point>) -> Board<Point> {
-    Board::new(points, encode, add, vec![
-        Point { x: 0, y: -1 },
-        Point { x: 0, y: 1 },
-        Point { x: -1, y: 0 },
-        Point { x: 1, y: 0 },
-    ])
+    Board::new(
+        points,
+        encode,
+        add,
+        vec![
+            Point { x: 0, y: -1 },
+            Point { x: 0, y: 1 },
+            Point { x: -1, y: 0 },
+            Point { x: 1, y: 0 },
+        ],
+    )
 }

@@ -21,12 +21,12 @@ pub struct ShapeAttrs {
 #[derive(Debug)]
 pub struct VisualShape {
     pub points: Vec<String>, // Using Vec<String> to represent an array of strings
-    pub attrs: ShapeAttrs, // Storing ShapeAttrs within VisualShape
+    pub attrs: ShapeAttrs,   // Storing ShapeAttrs within VisualShape
 }
 
 #[derive(Debug, Clone)]
 pub struct Shape<P: Clone> {
-    pub points: Vec<P>, // Using Vec<P> to represent an array of points
+    pub points: Vec<P>,    // Using Vec<P> to represent an array of points
     pub attrs: ShapeAttrs, // Storing ShapeAttrs within Shape
 }
 
@@ -41,10 +41,10 @@ fn identity(p: Point) -> Point {
 }
 
 const ROTATES: [Mapper; 4] = [
-    identity, // 0 degrees rotation
-    |p: Point| Point { x: -p.y, y: p.x },   // 90 degrees rotation
-    |p: Point| Point { x: -p.x, y: -p.y },  // 180 degrees rotation
-    |p: Point| Point { x: p.y, y: -p.x },   // 270 degrees rotation
+    identity,                              // 0 degrees rotation
+    |p: Point| Point { x: -p.y, y: p.x },  // 90 degrees rotation
+    |p: Point| Point { x: -p.x, y: -p.y }, // 180 degrees rotation
+    |p: Point| Point { x: p.y, y: -p.x },  // 270 degrees rotation
 ];
 
 pub fn variants(shape: &Shape<Point>) -> Vec<Vec<Point>> {
@@ -59,7 +59,8 @@ pub fn variants(shape: &Shape<Point>) -> Vec<Vec<Point>> {
     for &flip in &flips {
         for i in 0..=shape.attrs.rotations {
             let rotate = ROTATES[(i as usize) % 4];
-            let v: Vec<Point> = shape.points
+            let v: Vec<Point> = shape
+                .points
                 .iter()
                 .map(|&p| {
                     let pt: Point = p.into();

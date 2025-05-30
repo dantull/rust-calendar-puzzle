@@ -1,16 +1,16 @@
 use crate::board::Board;
+use crate::geometry::variants;
 use crate::geometry::Point;
 use crate::geometry::Shape;
-use crate::geometry::variants;
 
 struct ShapeState<P: Clone> {
-	point_index: usize,
-	variant_index: usize,
-	remove: Option<Vec<i16>>,
-	places: usize,
-	label: String,
-	base_variants: Vec<Vec<P>>,
-	points: Vec<P>,
+    point_index: usize,
+    variant_index: usize,
+    remove: Option<Vec<i16>>,
+    places: usize,
+    label: String,
+    base_variants: Vec<Vec<P>>,
+    points: Vec<P>,
 }
 
 fn new_shape_state(shape: Shape<Point>, label: String, ps: Vec<Point>) -> ShapeState<Point> {
@@ -38,7 +38,7 @@ fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, min_size:
             state.points[state.point_index].clone(),
             &state.label.clone(),
         );
-        
+
         if state.remove.is_some() {
             state.places += 1;
         }
@@ -55,11 +55,11 @@ fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, min_size:
         state.variant_index = 0;
     }
 
-    return state.point_index < state.points.len()
+    return state.point_index < state.points.len();
 }
 
 fn is_placed<P: Clone>(state: &ShapeState<P>) -> bool {
-    state.remove.is_some()   
+    state.remove.is_some()
 }
 
 fn never_placed<P: Clone>(state: &ShapeState<P>) -> bool {
@@ -74,14 +74,17 @@ pub struct Solver<P: Clone> {
     min_size: usize,
 }
 
-fn next_shape_state(
-    solver: &Solver<Point>,
-) -> ShapeState<Point> {
+fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
     let i = solver.shape_states.len();
     new_shape_state(
         solver.all_shapes[i].clone(),
         solver.all_labels[i].clone(),
-        solver.board.remaining().iter().map(|p| (*p).clone()).collect(),
+        solver
+            .board
+            .remaining()
+            .iter()
+            .map(|p| (*p).clone())
+            .collect(),
     )
 }
 
@@ -112,7 +115,7 @@ pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent, b: &Board<Poi
 
     let state = solver.shape_states.last_mut().unwrap();
 
-    let more = step_state(state, &mut solver.board, solver.min_size);   
+    let more = step_state(state, &mut solver.board, solver.min_size);
 
     if !more {
         if never_placed(state) {
@@ -125,18 +128,20 @@ pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent, b: &Board<Poi
         if is_placed(state) {
             let solved = solver.shape_states.len() == solver.all_labels.len();
 
-            callback(if solved {
-                StepEvent::Solved
-            } else {
-                StepEvent::Placed
-            }, &solver.board);
+            callback(
+                if solved {
+                    StepEvent::Solved
+                } else {
+                    StepEvent::Placed
+                },
+                &solver.board,
+            );
 
             if !solved {
-                let state =next_shape_state(&solver); 
+                let state = next_shape_state(&solver);
                 solver.shape_states.push(state);
             }
         }
         true
     }
-    
 }
