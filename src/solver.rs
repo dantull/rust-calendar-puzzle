@@ -73,9 +73,8 @@ pub struct Solver<P: Clone> {
 
 fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
     let i = solver.shape_states.len();
-    let shape = solver.labeled_shapes[i].clone();
     new_shape_state(
-        shape.0,
+        solver.labeled_shapes[i].0.clone(),
         solver
             .board
             .remaining()
