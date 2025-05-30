@@ -16,7 +16,7 @@ type BinaryOperation<P> = fn(&P, &P) -> P;
 pub struct Board<P> {
     filled: HashMap<Pe, String>,
     unfilled: HashSet<Pe>,
-    all: Vec<P>,
+    pub all: Vec<P>,
     encoder: Encoder<P>,
     adder: BinaryOperation<P>,
     dirs: Vec<P>,

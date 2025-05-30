@@ -1,7 +1,6 @@
 mod geometry;
 
 use geometry::Point;
-use geometry::variants;
 
 mod board;
 use board::make_point_board;
@@ -45,15 +44,9 @@ fn main() {
     }
 
     let points: Vec<Point> = board_pts.iter().map(|lp| lp.point).collect();
+    let board = make_point_board(points.clone());
 
-    let strs = convert_to_strings(&points, |_| 'x');
-
-    let result = strs.join("\n");
-    println!("{}", result);
-
-    let mut board = make_point_board(points.clone());
-
-    let shape = convert_to_shape(&VisualShape {
+    let l_piece = convert_to_shape(&VisualShape {
         points: vec![
             "***".to_string(),
             "*".to_string()
@@ -64,41 +57,20 @@ fn main() {
         },
     });
 
-    let count = board.reachable(&Point{x: 2, y: 0}, 20);
-    println!("Reachable points from (2, 0): {}", count);
+    let mut s = create_solver(board, vec![("L".to_string(), l_piece)]);
 
-    let shape_variants = variants(&shape);
-
-    let remaining_points: Vec<_> = board.remaining().into_iter().cloned().collect();
-    for p in remaining_points {
-        for v in &shape_variants {
-            let res = board.fill(v.to_vec(), p, "X");
-
-            if res.is_some() {
-                println!("=========");
-                print_board(&points, &board);
-
-                board.unfill(res.unwrap());
-            }
-        }
-    }
-
-    let mut s = create_solver(board, vec![("Shape1".to_string(), shape)]);
-
-    fn handle_step_event(e: solver::StepEvent) {
+    fn handle_step_event(e: solver::StepEvent, b: &board::Board<Point>) {
         match e {
             solver::StepEvent::FailedToPlace => println!("Failed to place shape"),
             solver::StepEvent::Placed => println!("Shape placed successfully"),
             solver::StepEvent::Solved => {
-                println!("All shapes placed successfully!");
-                // Note: 'points' and 'board' are not accessible here;
-                // if you need them, consider making them global or refactoring.
+                println!("Solved!");
+                print_board(&b.all, b);
             }
         }
     }
 
     while solver::step(&mut s, handle_step_event) {
         // Continue stepping until no more steps can be taken
-        println!("step");
     }
-}
+    }

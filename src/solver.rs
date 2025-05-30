@@ -105,7 +105,7 @@ pub enum StepEvent {
     Solved,
 }
 
-pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent)) -> bool {
+pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent, b: &Board<Point>)) -> bool {
     if solver.shape_states.is_empty() {
         return false; // No shapes to place
     }
@@ -116,7 +116,7 @@ pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent)) -> bool {
 
     if !more {
         if never_placed(state) {
-            callback(StepEvent::FailedToPlace);
+            callback(StepEvent::FailedToPlace, &solver.board);
         }
 
         solver.shape_states.pop();
@@ -129,7 +129,7 @@ pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent)) -> bool {
                 StepEvent::Solved
             } else {
                 StepEvent::Placed
-            });
+            }, &solver.board);
 
             if !solved {
                 let state =next_shape_state(&solver); 
