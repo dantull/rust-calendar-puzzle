@@ -1,12 +1,15 @@
 mod geometry;
 
 use geometry::Point;
+use geometry::variants;
 
 mod board;
 use board::make_point_board;
 
 mod stringify;
 use geometry::VisualShape;
+mod solver;
+use solver::create_solver;
 use stringify::convert_to_labeled_points;
 use stringify::convert_to_shape;
 use stringify::convert_to_strings;
@@ -64,7 +67,7 @@ fn main() {
     let count = board.reachable(&Point{x: 2, y: 0}, 20);
     println!("Reachable points from (2, 0): {}", count);
 
-    let shape_variants = shape.variants();
+    let shape_variants = variants(&shape);
 
     let remaining_points: Vec<_> = board.remaining().into_iter().cloned().collect();
     for p in remaining_points {
@@ -78,5 +81,24 @@ fn main() {
                 board.unfill(res.unwrap());
             }
         }
+    }
+
+    let mut s = create_solver(board, vec![("Shape1".to_string(), shape)]);
+
+    fn handle_step_event(e: solver::StepEvent) {
+        match e {
+            solver::StepEvent::FailedToPlace => println!("Failed to place shape"),
+            solver::StepEvent::Placed => println!("Shape placed successfully"),
+            solver::StepEvent::Solved => {
+                println!("All shapes placed successfully!");
+                // Note: 'points' and 'board' are not accessible here;
+                // if you need them, consider making them global or refactoring.
+            }
+        }
+    }
+
+    while solver::step(&mut s, handle_step_event) {
+        // Continue stepping until no more steps can be taken
+        println!("step");
     }
 }

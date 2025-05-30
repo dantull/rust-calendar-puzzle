@@ -24,8 +24,8 @@ pub struct VisualShape {
     pub attrs: ShapeAttrs, // Storing ShapeAttrs within VisualShape
 }
 
-#[derive(Debug)]
-pub struct Shape<P> {
+#[derive(Debug, Clone)]
+pub struct Shape<P: Clone> {
     pub points: Vec<P>, // Using Vec<P> to represent an array of points
     pub attrs: ShapeAttrs, // Storing ShapeAttrs within Shape
 }
@@ -47,33 +47,28 @@ const ROTATES: [Mapper; 4] = [
     |p: Point| Point { x: p.y, y: -p.x },   // 270 degrees rotation
 ];
 
-impl<P: Copy> Shape<P>
-where
-    P: Into<Point> + From<Point>,
-{
-    pub fn variants(&self) -> Vec<Vec<Point>> {
-        let flips: Vec<Mapper> = if self.attrs.chiral {
-            vec![identity, flip_point]
-        } else {
-            vec![identity]
-        };
+pub fn variants(shape: &Shape<Point>) -> Vec<Vec<Point>> {
+    let flips: Vec<Mapper> = if shape.attrs.chiral {
+        vec![identity, flip_point]
+    } else {
+        vec![identity]
+    };
 
-        let mut vs = Vec::with_capacity(self.attrs.rotations as usize * flips.len());
+    let mut vs = Vec::with_capacity(shape.attrs.rotations as usize * flips.len());
 
-        for &flip in &flips {
-            for i in 0..=self.attrs.rotations {
-                let rotate = ROTATES[(i as usize) % 4];
-                let v: Vec<Point> = self.points
-                    .iter()
-                    .map(|&p| {
-                        let pt: Point = p.into();
-                        rotate(flip(pt))
-                    })
-                    .collect();
-                vs.push(v);
-            }
+    for &flip in &flips {
+        for i in 0..=shape.attrs.rotations {
+            let rotate = ROTATES[(i as usize) % 4];
+            let v: Vec<Point> = shape.points
+                .iter()
+                .map(|&p| {
+                    let pt: Point = p.into();
+                    rotate(flip(pt))
+                })
+                .collect();
+            vs.push(v);
         }
-
-        vs
     }
+
+    vs
 }
