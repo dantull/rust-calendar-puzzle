@@ -180,7 +180,7 @@ fn main() {
             let label = &args[i];
             if let Some(lp) = board_pts.iter().find(|lp| lp.label == *label) {
                 let ps = lp.point;
-                board.fill(vec![ps], origin, "*");
+                board.fill(&vec![ps], origin, "*");
             } else {
                 eprintln!("Label '{}' not found.", label);
                 std::process::exit(1);

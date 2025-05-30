@@ -65,7 +65,7 @@ impl<P: Copy> Board<P> {
     }
 
     // Method to fill the board with markers at specified points
-    pub fn fill(&mut self, ps: Vec<P>, offset: P, marker: &str) -> Option<Vec<Pe>> {
+    pub fn fill(&mut self, ps: &Vec<P>, offset: P, marker: &str) -> Option<Vec<Pe>> {
         let mut eps = vec![];
 
         for p in ps {

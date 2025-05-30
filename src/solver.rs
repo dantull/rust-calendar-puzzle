@@ -34,9 +34,9 @@ fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, min_size:
 
     if state.variant_index < state.base_variants.len() {
         state.remove = board.fill(
-            state.base_variants[state.variant_index].clone(),
-            state.points[state.point_index].clone(),
-            &state.label.clone(),
+            &state.base_variants[state.variant_index],
+            state.points[state.point_index],
+            &state.label,
         );
 
         if state.remove.is_some() {
@@ -45,7 +45,7 @@ fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, min_size:
 
         state.variant_index += 1;
     } else if state.variant_index == state.base_variants.len() {
-        let p = state.points[state.point_index].clone();
+        let p = state.points[state.point_index];
 
         if board.reachable(&p, min_size) < min_size {
             state.point_index = state.points.len();
@@ -68,17 +68,17 @@ fn never_placed<P: Clone>(state: &ShapeState<P>) -> bool {
 
 pub struct Solver<P: Clone> {
     board: Board<P>,
-    all_labels: Vec<String>,
-    all_shapes: Vec<Shape<P>>,
+    labeled_shapes: Vec<(String, Shape<P>)>,
     shape_states: Vec<ShapeState<P>>,
     min_size: usize,
 }
 
 fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
     let i = solver.shape_states.len();
+    let shape = solver.labeled_shapes[i].clone();
     new_shape_state(
-        solver.all_shapes[i].clone(),
-        solver.all_labels[i].clone(),
+        shape.1,
+        shape.0,
         solver
             .board
             .remaining()
@@ -89,11 +89,11 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
 }
 
 pub fn create_solver(b: Board<Point>, shapes: Vec<(String, Shape<Point>)>) -> Solver<Point> {
+    let count = shapes.len();
     let mut solver = Solver {
         board: b,
-        all_labels: shapes.iter().map(|(label, _)| label.clone()).collect(),
-        all_shapes: shapes.iter().map(|(_, shape)| shape.clone()).collect(),
-        shape_states: Vec::with_capacity(shapes.len()),
+        labeled_shapes: shapes,
+        shape_states: Vec::with_capacity(count),
         min_size: 3, // FIXME: this should be determined by inspecting the shapes
     };
 
@@ -129,7 +129,7 @@ where
         !solver.shape_states.is_empty()
     } else {
         if is_placed(state) {
-            let solved = solver.shape_states.len() == solver.all_labels.len();
+            let solved = solver.shape_states.len() == solver.labeled_shapes.len();
 
             callback(
                 if solved {
