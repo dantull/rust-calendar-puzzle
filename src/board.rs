@@ -20,7 +20,7 @@ impl<P> Board<P> where P: Copy + Eq + std::hash::Hash {
     pub fn new(ps: Vec<P>, adder: BinaryOperation<P>, dirs: Vec<P>) -> Self {
         let mut unfilled = HashSet::new();
         for p in &ps {
-            unfilled.insert(encode(p));
+            unfilled.insert(*p);
         }
 
         Board {
@@ -34,10 +34,8 @@ impl<P> Board<P> where P: Copy + Eq + std::hash::Hash {
 
     // Private method to recursively spread and collect reachable points
     fn spread(&self, p: &P, limit: usize, accum: &mut HashSet<P>) {
-        let ep = encode(p);
-
-        if accum.len() < limit && self.unfilled.contains(&ep) && !accum.contains(&ep) {
-            accum.insert(ep);
+        if accum.len() < limit && self.unfilled.contains(&p) && !accum.contains(&p) {
+            accum.insert(*p);
 
             for d in &self.dirs {
                 self.spread(&(self.adder)(p, d), limit, accum);
@@ -62,11 +60,10 @@ impl<P> Board<P> where P: Copy + Eq + std::hash::Hash {
 
         for p in ps {
             let op = (self.adder)(&p, &offset);
-            let ep = encode(&op);
-            if !self.unfilled.contains(&ep) {
+            if !self.unfilled.contains(&op) {
                 return None;
             } else {
-                eps.push(ep);
+                eps.push(op);
             }
         }
         for ep in &eps {
@@ -86,23 +83,17 @@ impl<P> Board<P> where P: Copy + Eq + std::hash::Hash {
 
     // Method to get the marker at a specified point
     pub fn at(&self, p: &P) -> Option<&str> {
-        let ep = encode(p);
-        if self.unfilled.contains(&ep) {
+        if self.unfilled.contains(&p) {
             return None; // fillable square
         }
 
-        self.filled.get(&ep).map(|s| s.as_str())
+        self.filled.get(&p).map(|s| s.as_str())
     }
 
     // Method to get the remaining unfilled points
     pub fn remaining(&self) -> Vec<&P> {
         self.unfilled.iter().collect()
     }
-}
-
-// Function to encode a Point
-pub fn encode<P: Copy>(p: &P) -> P {
-    *p
 }
 
 // Function to add two Points
