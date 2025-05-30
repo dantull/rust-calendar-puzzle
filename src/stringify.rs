@@ -68,7 +68,7 @@ fn subtract(p1:Point, p2:Point) -> Point {
 }
 pub fn convert_to_shape(vs: &VisualShape) -> Shape<Point> {
     let string_slices: Vec<&str> = vs.points.iter().map(|s| s.as_str()).collect();
-    let points = convert_to_points(&string_slices, "");
+    let points = convert_to_points(&string_slices, " ");
     let first = points[0];
 
     Shape {

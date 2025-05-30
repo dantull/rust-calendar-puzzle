@@ -175,7 +175,7 @@ fn main() {
         match e {
             solver::StepEvent::FailedToPlace => (),
             solver::StepEvent::Placed => {
-                println!("Placed!");
+                println!("Placed! ({})", b.remaining().len());
                 print_board(&b.all, b);
             },
             solver::StepEvent::Solved => {
