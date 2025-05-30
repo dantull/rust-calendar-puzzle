@@ -205,19 +205,17 @@ fn main() {
         ],
     );
 
-    let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| {
-        match e {
-            solver::StepEvent::FailedToPlace => (),
-            solver::StepEvent::Placed => (),
-            solver::StepEvent::Solved => {
-                println!("Solved!");
-                print_board(&b.all, b);
+    let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| match e {
+        solver::StepEvent::FailedToPlace => (),
+        solver::StepEvent::Placed => (),
+        solver::StepEvent::Solved => {
+            println!("Solved!");
+            print_board(&b.all, b);
 
-                count += 1;
-                if count >= goal {
-                    println!("Reached goal of {} solutions.", goal);
-                    std::process::exit(0);
-                }
+            count += 1;
+            if count >= goal {
+                println!("Reached goal of {} solutions.", goal);
+                std::process::exit(0);
             }
         }
     };
