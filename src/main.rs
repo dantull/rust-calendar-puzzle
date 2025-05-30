@@ -185,4 +185,4 @@ fn main() {
     while solver::step(&mut s, handle_step_event) {
         // Continue stepping until no more steps can be taken
     }
-    }
+}
