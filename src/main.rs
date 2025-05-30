@@ -177,18 +177,27 @@ fn main() {
         ],
     );
 
-    fn handle_step_event(e: solver::StepEvent, b: &board::Board<Point>) {
+    let mut count = 0;
+    let goal = 1;
+
+    let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| {
         match e {
             solver::StepEvent::FailedToPlace => (),
             solver::StepEvent::Placed => (),
             solver::StepEvent::Solved => {
                 println!("Solved!");
                 print_board(&b.all, b);
+
+                count += 1;
+                if count >= goal {
+                    println!("Reached goal of {} solutions.", goal);
+                    std::process::exit(0);
+                }
             }
         }
-    }
+    };
 
-    while solver::step(&mut s, handle_step_event) {
+    while solver::step(&mut s, &mut handle_step_event) {
         // Continue stepping until no more steps can be taken
     }
 }

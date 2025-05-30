@@ -108,7 +108,10 @@ pub enum StepEvent {
     Solved,
 }
 
-pub fn step(solver: &mut Solver<Point>, callback: fn(e: StepEvent, b: &Board<Point>)) -> bool {
+pub fn step<F>(solver: &mut Solver<Point>, mut callback: F) -> bool
+where
+    F: FnMut(StepEvent, &Board<Point>),
+{
     if solver.shape_states.is_empty() {
         return false; // No shapes to place
     }
