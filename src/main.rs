@@ -57,12 +57,127 @@ fn main() {
         },
     });
 
-    let mut s = create_solver(board, vec![("L".to_string(), l_piece)]);
+    let j_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "****".to_string(),
+            "*".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: true,
+            rotations: 3,
+        },
+    });
+
+    let i_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "****".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: false,
+            rotations: 1,
+        },
+    });
+
+    let p_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "***".to_string(),
+            "**".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: true,
+            rotations: 3,
+        },
+    });
+
+    let n_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "**".to_string(),
+            " ***".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: true,
+            rotations: 3,
+        },
+    });
+
+    let u_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "* *".to_string(),
+            "***".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: false,
+            rotations: 3,
+        },
+    });
+
+    let t_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "***".to_string(),
+            " * ".to_string(),
+            " * ".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: false,
+            rotations: 3,
+        },
+    });
+
+    let v_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "***".to_string(),
+            "*".to_string(),
+            "*".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: false,
+            rotations: 3,
+        },
+    });
+
+    let z_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "**".to_string(),
+            " *".to_string(),
+            " **".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: true,
+            rotations: 1,
+        },
+    });
+
+    let s_piece = convert_to_shape(&VisualShape {
+        points: vec![
+            "**".to_string(),
+            " **".to_string(),
+        ],
+        attrs: geometry::ShapeAttrs {
+            chiral: true,
+            rotations: 1,
+        },
+    });
+
+    let mut s = create_solver(board, vec![
+        ("Z".to_string(), z_piece),
+        ("V".to_string(), v_piece),
+        ("U".to_string(), u_piece),
+        ("T".to_string(), t_piece),
+        ("P".to_string(), p_piece),
+        ("N".to_string(), n_piece),
+        ("L".to_string(), l_piece),
+        ("J".to_string(), j_piece),
+        ("I".to_string(), i_piece),
+        ("S".to_string(), s_piece),
+    ]);
 
     fn handle_step_event(e: solver::StepEvent, b: &board::Board<Point>) {
         match e {
-            solver::StepEvent::FailedToPlace => println!("Failed to place shape"),
-            solver::StepEvent::Placed => println!("Shape placed successfully"),
+            solver::StepEvent::FailedToPlace => (),
+            solver::StepEvent::Placed => {
+                println!("Placed!");
+                print_board(&b.all, b);
+            },
             solver::StepEvent::Solved => {
                 println!("Solved!");
                 print_board(&b.all, b);
