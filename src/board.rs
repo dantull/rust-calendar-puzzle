@@ -3,46 +3,38 @@ use std::collections::{HashMap, HashSet};
 // Importing the Point struct from the geometry module
 use crate::Point;
 
-// Type alias for 'pe'
-type Pe = i16;
-
-// Encoder function type alias
-type Encoder<P> = fn(&P) -> Pe;
-
 // Binary operation type alias
 type BinaryOperation<P> = fn(&P, &P) -> P;
 
 // Structure representing the Board
 pub struct Board<P> {
-    filled: HashMap<Pe, String>,
-    unfilled: HashSet<Pe>,
+    filled: HashMap<P, String>,
+    unfilled: HashSet<P>,
     pub all: Vec<P>,
-    encoder: Encoder<P>,
     adder: BinaryOperation<P>,
     dirs: Vec<P>,
 }
 
-impl<P: Copy> Board<P> {
+impl<P> Board<P> where P: Copy + Eq + std::hash::Hash {
     // Constructor
-    pub fn new(ps: Vec<P>, encoder: Encoder<P>, adder: BinaryOperation<P>, dirs: Vec<P>) -> Self {
+    pub fn new(ps: Vec<P>, adder: BinaryOperation<P>, dirs: Vec<P>) -> Self {
         let mut unfilled = HashSet::new();
         for p in &ps {
-            unfilled.insert(encoder(p));
+            unfilled.insert(encode(p));
         }
 
         Board {
             filled: HashMap::new(),
             unfilled,
             all: ps,
-            encoder,
             adder,
             dirs,
         }
     }
 
     // Private method to recursively spread and collect reachable points
-    fn spread(&self, p: &P, limit: usize, accum: &mut HashSet<Pe>) {
-        let ep = (self.encoder)(p);
+    fn spread(&self, p: &P, limit: usize, accum: &mut HashSet<P>) {
+        let ep = encode(p);
 
         if accum.len() < limit && self.unfilled.contains(&ep) && !accum.contains(&ep) {
             accum.insert(ep);
@@ -65,12 +57,12 @@ impl<P: Copy> Board<P> {
     }
 
     // Method to fill the board with markers at specified points
-    pub fn fill(&mut self, ps: &Vec<P>, offset: P, marker: &str) -> Option<Vec<Pe>> {
+    pub fn fill(&mut self, ps: &Vec<P>, offset: P, marker: &str) -> Option<Vec<P>> {
         let mut eps = vec![];
 
         for p in ps {
             let op = (self.adder)(&p, &offset);
-            let ep = (self.encoder)(&op);
+            let ep = encode(&op);
             if !self.unfilled.contains(&ep) {
                 return None;
             } else {
@@ -85,7 +77,7 @@ impl<P: Copy> Board<P> {
         Some(eps)
     }
 
-    pub fn unfill(&mut self, eps: Vec<Pe>) {
+    pub fn unfill(&mut self, eps: Vec<P>) {
         for ep in eps {
             self.unfilled.insert(ep);
             self.filled.remove(&ep);
@@ -94,7 +86,7 @@ impl<P: Copy> Board<P> {
 
     // Method to get the marker at a specified point
     pub fn at(&self, p: &P) -> Option<&str> {
-        let ep = (self.encoder)(p);
+        let ep = encode(p);
         if self.unfilled.contains(&ep) {
             return None; // fillable square
         }
@@ -104,16 +96,13 @@ impl<P: Copy> Board<P> {
 
     // Method to get the remaining unfilled points
     pub fn remaining(&self) -> Vec<&P> {
-        self.all
-            .iter()
-            .filter(|p| self.unfilled.contains(&(self.encoder)(p)))
-            .collect()
+        self.unfilled.iter().collect()
     }
 }
 
 // Function to encode a Point
-pub fn encode(p: &Point) -> Pe {
-    (p.x * 16 + p.y) as Pe
+pub fn encode<P: Copy>(p: &P) -> P {
+    *p
 }
 
 // Function to add two Points
@@ -128,7 +117,6 @@ pub fn add(a: &Point, b: &Point) -> Point {
 pub fn make_point_board(points: Vec<Point>) -> Board<Point> {
     Board::new(
         points,
-        encode,
         add,
         vec![
             Point { x: 0, y: -1 },

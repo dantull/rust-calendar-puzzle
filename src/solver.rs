@@ -6,7 +6,7 @@ use crate::geometry::Shape;
 struct ShapeState<P: Clone> {
     point_index: usize,
     variant_index: usize,
-    remove: Option<Vec<i16>>,
+    remove: Option<Vec<Point>>,
     places: usize,
     label: String,
     points: Vec<P>,
