@@ -15,7 +15,10 @@ pub struct Board<P> {
     dirs: Vec<P>,
 }
 
-impl<P> Board<P> where P: Copy + Eq + std::hash::Hash {
+impl<P> Board<P>
+where
+    P: Copy + Eq + std::hash::Hash,
+{
     // Constructor
     pub fn new(ps: Vec<P>, adder: BinaryOperation<P>, dirs: Vec<P>) -> Self {
         let mut unfilled = HashSet::new();

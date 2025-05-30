@@ -23,7 +23,12 @@ fn new_shape_state(label: String, ps: Vec<Point>) -> ShapeState<Point> {
     }
 }
 
-fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, base_variants: &Vec<Vec<Point>>, min_size: usize) -> bool {
+fn step_state(
+    state: &mut ShapeState<Point>,
+    board: &mut Board<Point>,
+    base_variants: &Vec<Vec<Point>>,
+    min_size: usize,
+) -> bool {
     if let Some(remove) = state.remove.take() {
         board.unfill(remove);
         state.remove = None;
@@ -86,10 +91,15 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
 
 pub fn create_solver(b: Board<Point>, shapes: Vec<(String, Shape<Point>)>) -> Solver<Point> {
     let count = shapes.len();
-    let min_size = shapes.iter().map(|(_, shape)| shape.points.len()).min().unwrap();
-    let base_variants = shapes.iter().map(|(_, shape)| {
-        variants(shape)
-    }).collect::<Vec<_>>();
+    let min_size = shapes
+        .iter()
+        .map(|(_, shape)| shape.points.len())
+        .min()
+        .unwrap();
+    let base_variants = shapes
+        .iter()
+        .map(|(_, shape)| variants(shape))
+        .collect::<Vec<_>>();
     let mut solver = Solver {
         board: b,
         labeled_shapes: shapes,
@@ -120,7 +130,12 @@ where
     let i = solver.shape_states.len() - 1;
     let state = solver.shape_states.last_mut().unwrap();
 
-    let more = step_state(state, &mut solver.board, &solver.base_variants[i], solver.min_size);
+    let more = step_state(
+        state,
+        &mut solver.board,
+        &solver.base_variants[i],
+        solver.min_size,
+    );
     if !more && is_placed(state) {
         callback(StepEvent::Placed, &solver.board);
     }
