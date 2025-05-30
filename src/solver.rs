@@ -90,11 +90,12 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
 
 pub fn create_solver(b: Board<Point>, shapes: Vec<(String, Shape<Point>)>) -> Solver<Point> {
     let count = shapes.len();
+    let min_size = shapes.iter().map(|(_, shape)| shape.points.len()).min().unwrap();
     let mut solver = Solver {
         board: b,
         labeled_shapes: shapes,
         shape_states: Vec::with_capacity(count),
-        min_size: 3, // FIXME: this should be determined by inspecting the shapes
+        min_size,
     };
 
     let state = next_shape_state(&solver);
