@@ -49,7 +49,7 @@ fn main() {
     }
 
     let points: Vec<Point> = board_pts.iter().map(|lp| lp.point).collect();
-    let board = make_point_board(points.clone());
+    let mut board = make_point_board(points.clone());
 
     let l_piece = convert_to_shape(&VisualShape {
         points: vec![
@@ -161,6 +161,34 @@ fn main() {
         },
     });
 
+    let origin = Point { x: 0, y: 0 };
+    let mut count = 0;
+    let args: Vec<String> = std::env::args().collect();
+    let mut goal = 1;
+    let mut i = 1;
+    while i < args.len() {
+        if args[i] == "-m" && i + 1 < args.len() {
+            if let Ok(val) = args[i + 1].parse::<usize>() {
+                goal = val;
+            } else {
+                eprintln!("Invalid value for -m: {}", args[i + 1]);
+                std::process::exit(1);
+            }
+            i += 1;
+        } else {
+            // Try to match argument to a labeled point and fill it in the board
+            let label = &args[i];
+            if let Some(lp) = board_pts.iter().find(|lp| lp.label == *label) {
+                let ps = lp.point;
+                board.fill(vec![ps], origin, "*");
+            } else {
+                eprintln!("Label '{}' not found.", label);
+                std::process::exit(1);
+            }
+        }
+        i += 1;
+    }
+
     let mut s = create_solver(
         board,
         vec![
@@ -176,9 +204,6 @@ fn main() {
             ("S".to_string(), s_piece),
         ],
     );
-
-    let mut count = 0;
-    let goal = 1;
 
     let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| {
         match e {
