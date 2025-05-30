@@ -28,8 +28,8 @@ fn print_board(points: &[Point], board: &board::Board<Point>) {
 
 fn main() {
     let board_pts = convert_to_labeled_points(&[
-        "Jan Feb Mar Apr May Jun",
-        "Jul Aug Sep Oct Nov Dec",
+        "Jan Feb Mar Apr May Jun ",
+        "Jul Aug Sep Oct Nov Dec ",
         "  1   2   3   4   5   6   7 ",
         "  8   9  10  11  12  13  14 ",
         " 15  16  17  18  19  20  21 ",
@@ -174,10 +174,7 @@ fn main() {
     fn handle_step_event(e: solver::StepEvent, b: &board::Board<Point>) {
         match e {
             solver::StepEvent::FailedToPlace => (),
-            solver::StepEvent::Placed => {
-                println!("Placed! ({})", b.remaining().len());
-                print_board(&b.all, b);
-            },
+            solver::StepEvent::Placed => (),
             solver::StepEvent::Solved => {
                 println!("Solved!");
                 print_board(&b.all, b);
