@@ -49,7 +49,7 @@ fn main() {
     }
 
     let points: Vec<Point> = board_pts.iter().map(|lp| lp.point).collect();
-    let mut board = make_point_board(points.clone());
+    let mut board = make_point_board(points);
 
     let l_piece = convert_to_shape(&VisualShape {
         points: vec![
