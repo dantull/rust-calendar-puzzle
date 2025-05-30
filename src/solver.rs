@@ -9,32 +9,29 @@ struct ShapeState<P: Clone> {
     remove: Option<Vec<i16>>,
     places: usize,
     label: String,
-    base_variants: Vec<Vec<P>>,
     points: Vec<P>,
 }
 
-fn new_shape_state(shape: Shape<Point>, label: String, ps: Vec<Point>) -> ShapeState<Point> {
-    let base_variants = variants(&shape);
+fn new_shape_state(label: String, ps: Vec<Point>) -> ShapeState<Point> {
     ShapeState {
         point_index: 0,
         variant_index: 0,
         remove: None,
         places: 0,
         label: label.to_string(),
-        base_variants,
         points: ps,
     }
 }
 
-fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, min_size: usize) -> bool {
+fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, base_variants: &Vec<Vec<Point>>, min_size: usize) -> bool {
     if let Some(remove) = state.remove.take() {
         board.unfill(remove);
         state.remove = None;
     }
 
-    if state.variant_index < state.base_variants.len() {
+    if state.variant_index < base_variants.len() {
         state.remove = board.fill(
-            &state.base_variants[state.variant_index],
+            &base_variants[state.variant_index],
             state.points[state.point_index],
             &state.label,
         );
@@ -44,7 +41,7 @@ fn step_state(state: &mut ShapeState<Point>, board: &mut Board<Point>, min_size:
         }
 
         state.variant_index += 1;
-    } else if state.variant_index == state.base_variants.len() {
+    } else if state.variant_index == base_variants.len() {
         let p = state.points[state.point_index];
 
         if board.reachable(&p, min_size) < min_size {
@@ -70,6 +67,7 @@ pub struct Solver<P: Clone> {
     board: Board<P>,
     labeled_shapes: Vec<(String, Shape<P>)>,
     shape_states: Vec<ShapeState<P>>,
+    base_variants: Vec<Vec<Vec<Point>>>,
     min_size: usize,
 }
 
@@ -77,7 +75,6 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
     let i = solver.shape_states.len();
     let shape = solver.labeled_shapes[i].clone();
     new_shape_state(
-        shape.1,
         shape.0,
         solver
             .board
@@ -91,10 +88,14 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
 pub fn create_solver(b: Board<Point>, shapes: Vec<(String, Shape<Point>)>) -> Solver<Point> {
     let count = shapes.len();
     let min_size = shapes.iter().map(|(_, shape)| shape.points.len()).min().unwrap();
+    let base_variants = shapes.iter().map(|(_, shape)| {
+        variants(shape)
+    }).collect::<Vec<_>>();
     let mut solver = Solver {
         board: b,
         labeled_shapes: shapes,
         shape_states: Vec::with_capacity(count),
+        base_variants,
         min_size,
     };
 
@@ -117,9 +118,13 @@ where
         return false; // No shapes to place
     }
 
+    let i = solver.shape_states.len() - 1;
     let state = solver.shape_states.last_mut().unwrap();
 
-    let more = step_state(state, &mut solver.board, solver.min_size);
+    let more = step_state(state, &mut solver.board, &solver.base_variants[i], solver.min_size);
+    if !more && is_placed(state) {
+        callback(StepEvent::Placed, &solver.board);
+    }
 
     if !more {
         if never_placed(state) {
