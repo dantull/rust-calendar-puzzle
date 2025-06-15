@@ -155,6 +155,7 @@ fn main() {
 
     let origin = Point { x: 0, y: 0 };
     let mut count = 0;
+    let mut verbose = false;
     let args: Vec<String> = std::env::args().collect();
     let mut goal = 1;
     let mut i = 1;
@@ -167,12 +168,20 @@ fn main() {
                 std::process::exit(1);
             }
             i += 1;
+        } else if args[i] == "-v" {
+            verbose = true;
         } else {
             // Try to match argument to a labeled point and fill it in the board
             let label = &args[i];
             if let Some(lp) = board_pts.iter().find(|lp| lp.label == *label) {
                 let ps = lp.point;
                 board.fill(&vec![ps], origin, "*");
+
+                if verbose {
+                    println!("Filled label '{}' at point {:?}", label, ps);
+                    print_board(&board.all, &board);
+                    println!();
+                }
             } else {
                 eprintln!("Label '{}' not found.", label);
                 std::process::exit(1);
@@ -199,7 +208,13 @@ fn main() {
 
     let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| match e {
         solver::StepEvent::FailedToPlace => (),
-        solver::StepEvent::Placed => (),
+        solver::StepEvent::Placed => {
+            if verbose {
+                println!("Placed:");
+                print_board(&b.all, b);
+                println!();
+            }
+        },
         solver::StepEvent::Solved => {
             println!("Solved!");
             print_board(&b.all, b);
