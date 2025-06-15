@@ -40,14 +40,6 @@ fn main() {
         4,
     );
 
-    println!("Labeled Points:");
-    for labeled_point in &board_pts {
-        println!(
-            "{} => ({}, {})",
-            labeled_point.label, labeled_point.point.x, labeled_point.point.y
-        );
-    }
-
     let points: Vec<Point> = board_pts.iter().map(|lp| lp.point).collect();
     let mut board = make_point_board(points);
 
