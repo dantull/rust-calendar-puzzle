@@ -80,12 +80,7 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
     let i = solver.shape_states.len();
     new_shape_state(
         solver.labeled_shapes[i].0.clone(),
-        solver
-            .board
-            .remaining()
-            .iter()
-            .map(|p| *(*p))
-            .collect(),
+        solver.board.remaining().iter().map(|p| *(*p)).collect(),
     )
 }
 

@@ -214,7 +214,7 @@ fn main() {
                 print_board(&b.all, b);
                 println!();
             }
-        },
+        }
         solver::StepEvent::Solved => {
             println!("Solved!");
             print_board(&b.all, b);

@@ -59,13 +59,7 @@ pub fn variants(shape: &Shape<Point>) -> Vec<Vec<Point>> {
     for &flip in &flips {
         for i in 0..=shape.attrs.rotations {
             let rotate = ROTATES[(i as usize) % 4];
-            let v: Vec<Point> = shape
-                .points
-                .iter()
-                .map(|&p| {
-                    rotate(flip(p))
-                })
-                .collect();
+            let v: Vec<Point> = shape.points.iter().map(|&p| rotate(flip(p))).collect();
             vs.push(v);
         }
     }
