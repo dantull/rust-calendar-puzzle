@@ -26,7 +26,7 @@ fn new_shape_state(label: String, ps: Vec<Point>) -> ShapeState<Point> {
 fn step_state(
     state: &mut ShapeState<Point>,
     board: &mut Board<Point>,
-    base_variants: &Vec<Vec<Point>>,
+    base_variants: &[Vec<Point>],
     min_size: usize,
 ) -> bool {
     if let Some(remove) = state.remove.take() {
@@ -57,7 +57,7 @@ fn step_state(
         state.variant_index = 0;
     }
 
-    return state.point_index < state.points.len();
+    state.point_index < state.points.len()
 }
 
 fn is_placed<P: Clone>(state: &ShapeState<P>) -> bool {
@@ -84,7 +84,7 @@ fn next_shape_state(solver: &Solver<Point>) -> ShapeState<Point> {
             .board
             .remaining()
             .iter()
-            .map(|p| (*p).clone())
+            .map(|p| *(*p))
             .collect(),
     )
 }
@@ -161,7 +161,7 @@ where
             );
 
             if !solved {
-                let state = next_shape_state(&solver);
+                let state = next_shape_state(solver);
                 solver.shape_states.push(state);
             }
         }

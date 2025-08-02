@@ -37,7 +37,7 @@ where
 
     // Private method to recursively spread and collect reachable points
     fn spread(&self, p: &P, limit: usize, accum: &mut HashSet<P>) {
-        if accum.len() < limit && self.unfilled.contains(&p) && !accum.contains(&p) {
+        if accum.len() < limit && self.unfilled.contains(p) && !accum.contains(p) {
             accum.insert(*p);
 
             for d in &self.dirs {
@@ -62,7 +62,7 @@ where
         let mut eps = vec![];
 
         for p in ps {
-            let op = (self.adder)(&p, &offset);
+            let op = (self.adder)(p, &offset);
             if !self.unfilled.contains(&op) {
                 return None;
             } else {
@@ -70,7 +70,7 @@ where
             }
         }
         for ep in &eps {
-            self.unfilled.remove(&ep);
+            self.unfilled.remove(ep);
             self.filled.insert(*ep, marker.to_string());
         }
 
@@ -86,11 +86,11 @@ where
 
     // Method to get the marker at a specified point
     pub fn at(&self, p: &P) -> Option<&str> {
-        if self.unfilled.contains(&p) {
+        if self.unfilled.contains(p) {
             return None; // fillable square
         }
 
-        self.filled.get(&p).map(|s| s.as_str())
+        self.filled.get(p).map(|s| s.as_str())
     }
 
     // Method to get the remaining unfilled points

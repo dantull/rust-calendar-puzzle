@@ -74,10 +74,10 @@ pub fn convert_to_strings(ps: &[Point], to_char: impl Fn(&Point) -> char) -> Vec
 // used to zero out shape coordinates so the first point is always (0, 0)
 // which is important for the solver's iteration
 fn subtract(p1: Point, p2: Point) -> Point {
-    return Point {
+    Point {
         x: p1.x - p2.x,
         y: p1.y - p2.y,
-    };
+    }
 }
 pub fn convert_to_shape(vs: &VisualShape) -> Shape<Point> {
     let string_slices: Vec<&str> = vs.points.iter().map(|s| s.as_str()).collect();
