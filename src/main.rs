@@ -25,6 +25,10 @@ fn print_board(points: &[Point], board: &board::Board<Point>) {
     println!("{}", board_strs.join("\n"));
 }
 
+fn to_strings(ps: &[&str]) -> Vec<String> {
+    ps.iter().map(|s| s.to_string()).collect()
+}
+
 fn main() {
     let board_pts = convert_to_labeled_points(
         &[
@@ -44,10 +48,10 @@ fn main() {
     let mut board = make_point_board(points);
 
     let l_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "***".to_string(), //
-            "*".to_string(),   //
-        ],
+        points: to_strings(&[
+            "***", //
+            "*",   //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: true,
             rotations: 3,
@@ -55,10 +59,10 @@ fn main() {
     });
 
     let j_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "****".to_string(), //
-            "*".to_string(),    //
-        ],
+        points: to_strings(&[
+            "****", //
+            "*",    //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: true,
             rotations: 3,
@@ -66,7 +70,7 @@ fn main() {
     });
 
     let i_piece = convert_to_shape(&VisualShape {
-        points: vec!["****".to_string()],
+        points: to_strings(&["****"]),
         attrs: geometry::ShapeAttrs {
             chiral: false,
             rotations: 1,
@@ -74,10 +78,10 @@ fn main() {
     });
 
     let p_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "***".to_string(), //
-            "**".to_string(),  //
-        ],
+        points: to_strings(&[
+            "***", //
+            "**",  //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: true,
             rotations: 3,
@@ -85,10 +89,10 @@ fn main() {
     });
 
     let n_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "**".to_string(),   //
-            " ***".to_string(), //
-        ],
+        points: to_strings(&[
+            "**",   //
+            " ***", //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: true,
             rotations: 3,
@@ -96,10 +100,10 @@ fn main() {
     });
 
     let u_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "* *".to_string(), //
-            "***".to_string(), //
-        ],
+        points: to_strings(&[
+            "* *", //
+            "***", //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: false,
             rotations: 3,
@@ -107,11 +111,11 @@ fn main() {
     });
 
     let t_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "***".to_string(), //
-            " * ".to_string(), //
-            " * ".to_string(), //
-        ],
+        points: to_strings(&[
+            "***", //
+            " * ", //
+            " * ", //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: false,
             rotations: 3,
@@ -119,11 +123,11 @@ fn main() {
     });
 
     let v_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "***".to_string(), //
-            "*".to_string(),   //
-            "*".to_string(),   //
-        ],
+        points: to_strings(&[
+            "***", //
+            "*",   //
+            "*",   //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: false,
             rotations: 3,
@@ -131,11 +135,11 @@ fn main() {
     });
 
     let z_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "**".to_string(),  //
-            " *".to_string(),  //
-            " **".to_string(), //
-        ],
+        points: to_strings(&[
+            "**",  //
+            " *",  //
+            " **", //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: true,
             rotations: 1,
@@ -143,10 +147,10 @@ fn main() {
     });
 
     let s_piece = convert_to_shape(&VisualShape {
-        points: vec![
-            "**".to_string(),  //
-            " **".to_string(), //
-        ],
+        points: to_strings(&[
+            "**",  //
+            " **", //
+        ]),
         attrs: geometry::ShapeAttrs {
             chiral: true,
             rotations: 1,
