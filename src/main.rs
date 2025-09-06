@@ -16,7 +16,6 @@ use stringify::convert_to_strings;
 
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
-use num_cpus;
 
 fn print_board(points: &[Point], board: &board::Board<Point>) {
     let board_strs = convert_to_strings(points, |p| {
@@ -202,17 +201,17 @@ fn main() {
         i += 1;
     }
     let shapes = vec![
-            ("Z".to_string(), z_piece),
-            ("V".to_string(), v_piece),
-            ("U".to_string(), u_piece),
-            ("T".to_string(), t_piece),
-            ("P".to_string(), p_piece),
-            ("N".to_string(), n_piece),
-            ("L".to_string(), l_piece),
-            ("J".to_string(), j_piece),
-            ("I".to_string(), i_piece),
-            ("S".to_string(), s_piece),
-        ];
+        ("Z".to_string(), z_piece),
+        ("V".to_string(), v_piece),
+        ("U".to_string(), u_piece),
+        ("T".to_string(), t_piece),
+        ("P".to_string(), p_piece),
+        ("N".to_string(), n_piece),
+        ("L".to_string(), l_piece),
+        ("J".to_string(), j_piece),
+        ("I".to_string(), i_piece),
+        ("S".to_string(), s_piece),
+    ];
 
     if parallel {
         let solvers = create_parallel_solver(board, shapes, 2);
@@ -239,11 +238,12 @@ fn main() {
                     };
                     match maybe_solver {
                         Ok(mut solver) => {
-                            let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| {
-                                if let solver::StepEvent::Solved = e {
-                                    let _ = solution_tx.send(b.clone());
-                                }
-                            };
+                            let mut handle_step_event =
+                                |e: solver::StepEvent, b: &board::Board<Point>| {
+                                    if let solver::StepEvent::Solved = e {
+                                        let _ = solution_tx.send(b.clone());
+                                    }
+                                };
                             while solver::step(&mut solver, &mut handle_step_event) {}
                         }
                         Err(_) => break, // Channel closed, exit thread
@@ -270,10 +270,7 @@ fn main() {
             }
         }
     } else {
-        let mut s = create_solver(
-            board,
-            shapes,
-        );
+        let mut s = create_solver(board, shapes);
 
         let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| match e {
             solver::StepEvent::FailedToPlace => (),
