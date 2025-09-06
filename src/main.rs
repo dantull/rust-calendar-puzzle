@@ -14,6 +14,10 @@ use stringify::convert_to_labeled_points;
 use stringify::convert_to_shape;
 use stringify::convert_to_strings;
 
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread;
+use num_cpus;
+
 fn print_board(points: &[Point], board: &board::Board<Point>) {
     let board_strs = convert_to_strings(points, |p| {
         if let Some(marker) = board.at(p) {
@@ -213,6 +217,58 @@ fn main() {
     if parallel {
         let solvers = create_parallel_solver(board, shapes, 2);
         println!("Created {} parallel solvers.", solvers.len());
+
+        let (solver_tx, solver_rx) = mpsc::channel();
+        let (solution_tx, solution_rx) = mpsc::channel();
+
+        let solver_rx = Arc::new(Mutex::new(solver_rx));
+
+        let num_workers = num_cpus::get();
+        println!("Spawning {} worker threads.", num_workers);
+
+        // Spawn worker threads
+        for _ in 0..num_workers {
+            let solver_rx = Arc::clone(&solver_rx);
+            let solution_tx = solution_tx.clone();
+            thread::spawn(move || {
+                loop {
+                    // Lock and receive a solver
+                    let maybe_solver = {
+                        let lock = solver_rx.lock().unwrap();
+                        lock.recv()
+                    };
+                    match maybe_solver {
+                        Ok(mut solver) => {
+                            let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| {
+                                if let solver::StepEvent::Solved = e {
+                                    let _ = solution_tx.send(b.clone());
+                                }
+                            };
+                            while solver::step(&mut solver, &mut handle_step_event) {}
+                        }
+                        Err(_) => break, // Channel closed, exit thread
+                    }
+                }
+            });
+        }
+
+        // Send solvers to workers
+        for solver in solvers {
+            solver_tx.send(solver).unwrap();
+        }
+        drop(solver_tx); // Close channel so workers exit when done
+
+        // Collect and print solutions
+        let mut count = 0;
+        for solution in solution_rx {
+            println!("Solved!");
+            print_board(&solution.all, &solution);
+            count += 1;
+            if count >= goal {
+                println!("Reached goal of {} solutions.", goal);
+                break;
+            }
+        }
     } else {
         let mut s = create_solver(
             board,
