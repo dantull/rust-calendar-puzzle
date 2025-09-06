@@ -7,6 +7,7 @@ use crate::Point;
 type BinaryOperation<P> = fn(&P, &P) -> P;
 
 // Structure representing the Board
+#[derive(Clone)]
 pub struct Board<P> {
     filled: HashMap<P, String>,
     unfilled: HashSet<P>,
