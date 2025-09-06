@@ -4,7 +4,8 @@ use geometry::Point;
 
 mod board;
 use board::make_point_board;
-
+mod parallel;
+use parallel::create_parallel_solver;
 mod stringify;
 use geometry::VisualShape;
 mod solver;
@@ -160,6 +161,7 @@ fn main() {
     let origin = Point { x: 0, y: 0 };
     let mut count = 0;
     let mut verbose = false;
+    let mut parallel = false;
     let args: Vec<String> = std::env::args().collect();
     let mut goal = 1;
     let mut i = 1;
@@ -174,6 +176,8 @@ fn main() {
             i += 1;
         } else if args[i] == "-v" {
             verbose = true;
+        } else if args[i] == "-p" {
+            parallel = true;
         } else {
             // Try to match argument to a labeled point and fill it in the board
             let label = &args[i];
@@ -193,10 +197,7 @@ fn main() {
         }
         i += 1;
     }
-
-    let mut s = create_solver(
-        board,
-        vec![
+    let shapes = vec![
             ("Z".to_string(), z_piece),
             ("V".to_string(), v_piece),
             ("U".to_string(), u_piece),
@@ -207,31 +208,40 @@ fn main() {
             ("J".to_string(), j_piece),
             ("I".to_string(), i_piece),
             ("S".to_string(), s_piece),
-        ],
-    );
+        ];
 
-    let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| match e {
-        solver::StepEvent::FailedToPlace => (),
-        solver::StepEvent::Placed => {
-            if verbose {
-                println!("Placed:");
+    if parallel {
+        let solvers = create_parallel_solver(board, shapes, 2);
+        println!("Created {} parallel solvers.", solvers.len());
+    } else {
+        let mut s = create_solver(
+            board,
+            shapes,
+        );
+
+        let mut handle_step_event = |e: solver::StepEvent, b: &board::Board<Point>| match e {
+            solver::StepEvent::FailedToPlace => (),
+            solver::StepEvent::Placed => {
+                if verbose {
+                    println!("Placed:");
+                    print_board(&b.all, b);
+                    println!();
+                }
+            }
+            solver::StepEvent::Solved => {
+                println!("Solved!");
                 print_board(&b.all, b);
-                println!();
-            }
-        }
-        solver::StepEvent::Solved => {
-            println!("Solved!");
-            print_board(&b.all, b);
 
-            count += 1;
-            if count >= goal {
-                println!("Reached goal of {} solutions.", goal);
-                std::process::exit(0);
+                count += 1;
+                if count >= goal {
+                    println!("Reached goal of {} solutions.", goal);
+                    std::process::exit(0);
+                }
             }
-        }
-    };
+        };
 
-    while solver::step(&mut s, &mut handle_step_event) {
-        // Continue stepping until no more steps can be taken
+        while solver::step(&mut s, &mut handle_step_event) {
+            // Continue stepping until no more steps can be taken
+        }
     }
 }
