@@ -252,6 +252,8 @@ fn main() {
             });
         }
 
+        drop(solution_tx); // close channel so main thread can exit when done
+
         // Send solvers to workers
         for solver in solvers {
             solver_tx.send(solver).unwrap();
